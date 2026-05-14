@@ -19,11 +19,13 @@ public class EditorWindow {
         JMenuItem ukoncitItem = new JMenuItem("Ukončit");
 
         JMenuItem zkratkyItem = new JMenuItem("Klávesové zkratky");
+        JMenuItem kontaktItem = new JMenuItem("Kontakt");
         JMenuItem infoItem = new JMenuItem("O programu");
 
         ukoncitItem.addActionListener(e -> ukoncit());
 
         zkratkyItem.addActionListener(e -> zobrazZkratky());
+        kontaktItem.addActionListener(e -> zobrazKontakt());
         infoItem.addActionListener(e -> zobrazInfoOProgramu());
 
         ukoncitItem.setAccelerator(
@@ -33,6 +35,7 @@ public class EditorWindow {
         souborMenu.add(ukoncitItem);
 
         napovedaMenu.add(zkratkyItem);
+        napovedaMenu.add(kontaktItem);
         napovedaMenu.add(infoItem);
 
         menuBar.add(souborMenu);
@@ -53,14 +56,21 @@ public class EditorWindow {
         );
     }
 
+    private void zobrazKontakt(){
+        JOptionPane.showMessageDialog(rootPanel,
+                "Autor: shyestfern\n" +
+                        "GitHub: https://github.com/shyestfern/mebi",
+                        "Kontakt",
+                        JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
     private void zobrazInfoOProgramu(){
         JOptionPane.showMessageDialog(rootPanel,
                 "mebi\n" +
                         "Verze 1.0\n" +
                         "Textový editor s GUI\n\n" +
-                        "Autor: shyestfern\n" +
-                        "Rok: 2026\n" +
-                        "GitHub: https://github.com/shyestfern/mebi",
+                        "Rok: 2026",
                         "O programu",
                         JOptionPane.INFORMATION_MESSAGE
         );
