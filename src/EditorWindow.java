@@ -17,16 +17,22 @@ public class EditorWindow {
         JMenu napovedaMenu = new JMenu("Nápověda");
 
         JMenuItem ukoncitItem = new JMenuItem("Ukončit");
+
+        JMenuItem zkratkyItem = new JMenuItem("Klávesové zkratky");
         JMenuItem infoItem = new JMenuItem("O programu");
 
         ukoncitItem.addActionListener(e -> ukoncit());
-        infoItem.addActionListener(e -> zobrazInfo());
+
+        zkratkyItem.addActionListener(e -> zobrazZkratky());
+        infoItem.addActionListener(e -> zobrazInfoOProgramu());
 
         ukoncitItem.setAccelerator(
                 KeyStroke.getKeyStroke("ctrl Q")
         );
 
         souborMenu.add(ukoncitItem);
+
+        napovedaMenu.add(zkratkyItem);
         napovedaMenu.add(infoItem);
 
         menuBar.add(souborMenu);
@@ -39,7 +45,15 @@ public class EditorWindow {
         System.exit(0);
     }
 
-    private void zobrazInfo(){
+    private void zobrazZkratky(){
+        JOptionPane.showMessageDialog(rootPanel,
+                "Ctrl + Q: Ukončit program",
+                    "Klávesové zkratky",
+                        JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
+    private void zobrazInfoOProgramu(){
         JOptionPane.showMessageDialog(rootPanel,
                 "mebi\n" +
                         "Verze 1.0\n" +
