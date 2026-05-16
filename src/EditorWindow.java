@@ -23,8 +23,10 @@ public class EditorWindow {
         JMenu souborMenu = new JMenu("Soubor");
         JMenu napovedaMenu = new JMenu("Nápověda");
 
+        JMenuItem novyItem = new JMenuItem("Nový");
         JMenuItem otevritItem = new JMenuItem("Otevřít");
         JMenuItem ulozitItem = new JMenuItem("Uložit");
+        JMenuItem ulozitJakoItem = new JMenuItem("Uložit jako");
         JMenuItem ukoncitItem = new JMenuItem("Ukončit");
 
         JMenuItem navodItem = new JMenuItem("Návod");
@@ -33,8 +35,10 @@ public class EditorWindow {
         JMenuItem kontaktItem = new JMenuItem("Kontakt");
         JMenuItem licenceItem = new JMenuItem("Licence");
 
+        novyItem.addActionListener(e -> novy());
         otevritItem.addActionListener(e -> otevrit());
         ulozitItem.addActionListener(e -> ulozit());
+        ulozitJakoItem.addActionListener(e -> ulozitJako());
         ukoncitItem.addActionListener(e -> ukoncit());
 
         navodItem.addActionListener(e -> zobrazNavod());
@@ -43,18 +47,26 @@ public class EditorWindow {
         kontaktItem.addActionListener(e -> zobrazKontakt());
         licenceItem.addActionListener(e -> zobrazLicenci());
 
+        novyItem.setAccelerator(
+                KeyStroke.getKeyStroke("ctrl N")
+        );
         otevritItem.setAccelerator(
                 KeyStroke.getKeyStroke("ctrl O")
         );
         ulozitItem.setAccelerator(
                 KeyStroke.getKeyStroke("ctrl S")
         );
+        ulozitJakoItem.setAccelerator(
+                KeyStroke.getKeyStroke("ctrl shift S")
+        );
         ukoncitItem.setAccelerator(
                 KeyStroke.getKeyStroke("ctrl Q")
         );
 
+        souborMenu.add(novyItem);
         souborMenu.add(otevritItem);
         souborMenu.add(ulozitItem);
+        souborMenu.add(ulozitJakoItem);
         souborMenu.add(ukoncitItem);
 
         napovedaMenu.add(navodItem);
@@ -69,6 +81,28 @@ public class EditorWindow {
         return menuBar;
     }
 
+    private void novy(){
+        if(!textArea.getText().isEmpty()){
+            int zvolenaMoznost = JOptionPane.showConfirmDialog(
+                    rootPanel,
+                    "Chcete uložit změny?",
+                    "Nový soubor",
+                    JOptionPane.YES_NO_CANCEL_OPTION
+            );
+
+            if(zvolenaMoznost == JOptionPane.YES_OPTION){
+                ulozit();
+                textArea.setText("");
+            }
+            else if(zvolenaMoznost == JOptionPane.NO_OPTION){
+                textArea.setText("");
+            }
+        }
+        else{
+            textArea.setText("");
+        }
+    }
+
     private void otevrit(){
         try(Scanner scanner = new Scanner(new File(FILE_NAME))){
             textArea.setText("");
@@ -76,7 +110,8 @@ public class EditorWindow {
                 textArea.append(scanner.nextLine() + "\n");
             }
         } catch (FileNotFoundException e) {
-            JOptionPane.showMessageDialog(rootPanel,
+            JOptionPane.showMessageDialog(
+                        rootPanel,
                 "Chyba při načítání souboru!"
             );
         }
@@ -85,12 +120,43 @@ public class EditorWindow {
     private void ulozit(){
         try(FileWriter fw = new FileWriter(FILE_NAME, false)){
             fw.write(textArea.getText());
-            JOptionPane.showMessageDialog(rootPanel,
+            JOptionPane.showMessageDialog(
+                        rootPanel,
                 "Uloženo do " + FILE_NAME
             );
         } catch (IOException e) {
-            JOptionPane.showMessageDialog(rootPanel,
+            JOptionPane.showMessageDialog(
+                        rootPanel,
                 "Chyba při ukládání souboru!"
+            );
+        }
+    }
+
+    private void ulozitJako(){
+        String nazevSouboru = JOptionPane.showInputDialog(
+                    rootPanel,
+          "Zadejte název souboru:"
+        );
+
+        if(nazevSouboru == null || nazevSouboru.trim().isEmpty()){
+            return;
+        }
+
+        if(!nazevSouboru.endsWith(".txt")){
+            nazevSouboru += ".txt";
+        }
+
+        try(FileWriter fw = new FileWriter(nazevSouboru, false)){
+            fw.write(textArea.getText());
+
+            JOptionPane.showMessageDialog(
+                    rootPanel,
+                    "Uloženo do " + nazevSouboru
+            );
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(
+                    rootPanel,
+                    "Chyba při ukládání souboru!"
             );
         }
     }
@@ -100,7 +166,8 @@ public class EditorWindow {
     }
 
     private void zobrazNavod(){
-        JOptionPane.showMessageDialog(rootPanel,
+        JOptionPane.showMessageDialog(
+                rootPanel,
                 "1. Pište svůj text do hlavního pole.\n" +
                 "2. Použijte nabídku 'Soubor' pro práci se soubory.\n" +
                 "3. Klávesové zkratky najdete vedle položek v menu.\n" +
@@ -111,9 +178,12 @@ public class EditorWindow {
     }
 
     private void zobrazZkratky(){
-        JOptionPane.showMessageDialog(rootPanel,
-                "Ctrl + O: Otevřít soubor\n" +
+        JOptionPane.showMessageDialog(
+                    rootPanel,
+                "Ctrl + N: Nový soubor\n" +
+                    "Ctrl + O: Otevřít soubor\n" +
                     "Ctrl + S: Uložit práci\n" +
+                    "Ctrl + Shift + S: Uložit jako...\n" +
                     "Ctrl + Q: Ukončit program",
                     "Klávesové zkratky",
                         JOptionPane.INFORMATION_MESSAGE
@@ -121,7 +191,8 @@ public class EditorWindow {
     }
 
     private void zobrazInfoOProgramu(){
-        JOptionPane.showMessageDialog(rootPanel,
+        JOptionPane.showMessageDialog(
+                        rootPanel,
                 "mebi\n" +
                         "Verze 1.0\n" +
                         "Textový editor s GUI\n\n" +
@@ -132,7 +203,8 @@ public class EditorWindow {
     }
 
     private void zobrazKontakt(){
-        JOptionPane.showMessageDialog(rootPanel,
+        JOptionPane.showMessageDialog(
+                rootPanel,
                 "Autor: shyestfern\n" +
                         "GitHub: https://github.com/shyestfern/mebi",
                 "Kontakt",
@@ -141,7 +213,8 @@ public class EditorWindow {
     }
 
     private void zobrazLicenci(){
-        JOptionPane.showMessageDialog(rootPanel,
+        JOptionPane.showMessageDialog(
+                rootPanel,
                 "Tento program byl vytvořen jako školní projekt.\n" +
                         "Je určen pouze pro vzdělávací účely.",
                 "Licence",
