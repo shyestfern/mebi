@@ -21,6 +21,7 @@ public class EditorWindow {
         JMenuBar menuBar = new JMenuBar();
 
         JMenu souborMenu = new JMenu("Soubor");
+        JMenu analyzaMenu = new JMenu("Analýza");
         JMenu napovedaMenu = new JMenu("Nápověda");
 
         JMenuItem novyItem = new JMenuItem("Nový");
@@ -28,6 +29,8 @@ public class EditorWindow {
         JMenuItem ulozitItem = new JMenuItem("Uložit");
         JMenuItem ulozitJakoItem = new JMenuItem("Uložit jako");
         JMenuItem ukoncitItem = new JMenuItem("Ukončit");
+
+        JMenuItem analyzaTextuItem = new JMenuItem("Analýza textu");
 
         JMenuItem navodItem = new JMenuItem("Návod");
         JMenuItem zkratkyItem = new JMenuItem("Klávesové zkratky");
@@ -40,6 +43,8 @@ public class EditorWindow {
         ulozitItem.addActionListener(e -> ulozit());
         ulozitJakoItem.addActionListener(e -> ulozitJako());
         ukoncitItem.addActionListener(e -> ukoncit());
+
+        analyzaTextuItem.addActionListener(e -> analyzaTextu());
 
         navodItem.addActionListener(e -> zobrazNavod());
         zkratkyItem.addActionListener(e -> zobrazZkratky());
@@ -69,6 +74,8 @@ public class EditorWindow {
         souborMenu.add(ulozitJakoItem);
         souborMenu.add(ukoncitItem);
 
+        analyzaMenu.add(analyzaTextuItem);
+
         napovedaMenu.add(navodItem);
         napovedaMenu.add(zkratkyItem);
         napovedaMenu.add(infoItem);
@@ -76,6 +83,7 @@ public class EditorWindow {
         napovedaMenu.add(licenceItem);
 
         menuBar.add(souborMenu);
+        menuBar.add(analyzaMenu);
         menuBar.add(napovedaMenu);
 
         return menuBar;
@@ -163,6 +171,29 @@ public class EditorWindow {
 
     private void ukoncit(){
         System.exit(0);
+    }
+
+    private void analyzaTextu(){
+        String text = textArea.getText();
+
+        int pocetZnaku = text.length();
+
+        int pocetRadku = text.isEmpty()
+                ? 0
+                : text.split("\n").length;
+
+        int pocetSlov = text.isEmpty()
+                ? 0
+                : text.trim().split("\\s+").length;
+
+        JOptionPane.showMessageDialog(
+                rootPanel,
+                "Počet znaků: " + pocetZnaku + "\n" +
+                "Počet řádků: " + pocetRadku + "\n" +
+                "Počet slov: " + pocetSlov,
+                "Analýza textu",
+                JOptionPane.INFORMATION_MESSAGE
+        );
     }
 
     private void zobrazNavod(){
