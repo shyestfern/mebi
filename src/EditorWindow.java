@@ -1,10 +1,17 @@
 import javax.swing.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Scanner;
 
 public class EditorWindow {
     private JPanel rootPanel;
     private JScrollPane scrollPane;
     private JTextArea textArea;
     private JPanel editorPanel;
+
+    private static final String FILE_NAME = "dokument.txt";
 
     public JPanel getRootPanel(){
         return rootPanel;
@@ -16,6 +23,8 @@ public class EditorWindow {
         JMenu souborMenu = new JMenu("Soubor");
         JMenu napovedaMenu = new JMenu("Nápověda");
 
+        JMenuItem otevritItem = new JMenuItem("Otevřít");
+        JMenuItem ulozitItem = new JMenuItem("Uložit");
         JMenuItem ukoncitItem = new JMenuItem("Ukončit");
 
         JMenuItem navodItem = new JMenuItem("Návod");
@@ -24,6 +33,8 @@ public class EditorWindow {
         JMenuItem kontaktItem = new JMenuItem("Kontakt");
         JMenuItem licenceItem = new JMenuItem("Licence");
 
+        otevritItem.addActionListener(e -> otevrit());
+        ulozitItem.addActionListener(e -> ulozit());
         ukoncitItem.addActionListener(e -> ukoncit());
 
         navodItem.addActionListener(e -> zobrazNavod());
@@ -32,10 +43,18 @@ public class EditorWindow {
         kontaktItem.addActionListener(e -> zobrazKontakt());
         licenceItem.addActionListener(e -> zobrazLicenci());
 
+        otevritItem.setAccelerator(
+                KeyStroke.getKeyStroke("ctrl O")
+        );
+        ulozitItem.setAccelerator(
+                KeyStroke.getKeyStroke("ctrl S")
+        );
         ukoncitItem.setAccelerator(
                 KeyStroke.getKeyStroke("ctrl Q")
         );
 
+        souborMenu.add(otevritItem);
+        souborMenu.add(ulozitItem);
         souborMenu.add(ukoncitItem);
 
         napovedaMenu.add(navodItem);
@@ -48,6 +67,32 @@ public class EditorWindow {
         menuBar.add(napovedaMenu);
 
         return menuBar;
+    }
+
+    private void otevrit(){
+        try(Scanner scanner = new Scanner(new File(FILE_NAME))){
+            textArea.setText("");
+            while(scanner.hasNextLine()){
+                textArea.append(scanner.nextLine() + "\n");
+            }
+        } catch (FileNotFoundException e) {
+            JOptionPane.showMessageDialog(rootPanel,
+                "Chyba při načítání souboru!"
+            );
+        }
+    }
+
+    private void ulozit(){
+        try(FileWriter fw = new FileWriter(FILE_NAME, false)){
+            fw.write(textArea.getText());
+            JOptionPane.showMessageDialog(rootPanel,
+                "Uloženo do " + FILE_NAME
+            );
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(rootPanel,
+                "Chyba při ukládání souboru!"
+            );
+        }
     }
 
     private void ukoncit(){
@@ -67,7 +112,9 @@ public class EditorWindow {
 
     private void zobrazZkratky(){
         JOptionPane.showMessageDialog(rootPanel,
-                "Ctrl + Q: Ukončit program",
+                "Ctrl + O: Otevřít soubor\n" +
+                    "Ctrl + S: Uložit práci\n" +
+                    "Ctrl + Q: Ukončit program",
                     "Klávesové zkratky",
                         JOptionPane.INFORMATION_MESSAGE
         );
