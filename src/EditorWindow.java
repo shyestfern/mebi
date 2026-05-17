@@ -31,6 +31,7 @@ public class EditorWindow {
         JMenuItem ukoncitItem = new JMenuItem("Ukončit");
 
         JMenuItem analyzaTextuItem = new JMenuItem("Analýza textu");
+        JMenuItem analyzaSlovItem = new JMenuItem("Analýza slov");
 
         JMenuItem navodItem = new JMenuItem("Návod");
         JMenuItem zkratkyItem = new JMenuItem("Klávesové zkratky");
@@ -45,6 +46,7 @@ public class EditorWindow {
         ukoncitItem.addActionListener(e -> ukoncit());
 
         analyzaTextuItem.addActionListener(e -> analyzaTextu());
+        analyzaSlovItem.addActionListener(e -> analyzaSlov());
 
         navodItem.addActionListener(e -> zobrazNavod());
         zkratkyItem.addActionListener(e -> zobrazZkratky());
@@ -75,6 +77,7 @@ public class EditorWindow {
         souborMenu.add(ukoncitItem);
 
         analyzaMenu.add(analyzaTextuItem);
+        analyzaMenu.add(analyzaSlovItem);
 
         napovedaMenu.add(navodItem);
         napovedaMenu.add(zkratkyItem);
@@ -192,6 +195,47 @@ public class EditorWindow {
                 "Počet řádků: " + pocetRadku + "\n" +
                 "Počet slov: " + pocetSlov,
                 "Analýza textu",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
+    private void analyzaSlov(){
+        String text = textArea.getText();
+
+        String[] slova = text.trim().isEmpty()
+                ? new String[0]
+                : text.trim().split("\\s+");
+
+        if(slova.length == 0){
+            JOptionPane.showMessageDialog(
+                    rootPanel,
+                    "Žádná slova v textu."
+            );
+            return;
+        }
+
+        String nejdelsi = slova[0];
+        String nejkratsi = slova[0];
+        int celkemZnaku = 0;
+
+        for(String s : slova){
+            if(s.length() > nejdelsi.length()){
+                nejdelsi = s;
+            }
+            if(s.length() < nejkratsi.length()){
+                nejkratsi = s;
+            }
+            celkemZnaku += s.length();
+        }
+
+        double prumer = (double) celkemZnaku / slova.length;
+
+        JOptionPane.showMessageDialog(
+                rootPanel,
+                "Nejdelší slovo: " + nejdelsi + "\n" +
+                        "Nejkratší slovo: " + nejkratsi + "\n" +
+                        "Průměrná délka slova: " + String.format("%.2f", prumer),
+                "Analýza slov",
                 JOptionPane.INFORMATION_MESSAGE
         );
     }
