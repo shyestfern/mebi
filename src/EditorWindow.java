@@ -208,25 +208,10 @@ public class EditorWindow {
         );
     }
 
-    // OPRAV TUTO METODU - NEPOČÍTÁ SPRÁVNĚ VĚTY
-
     private void analyzaVet(){
-        String text = textArea.getText();
-        int pocetVet = 0;
+        String text = textArea.getText().trim();
 
-        for(int i = 0; i < text.length(); i++){
-            char znak = text.charAt(i);
-
-            if(znak == '.' || znak == '!' || znak == '?'){
-                pocetVet++;
-            }
-        }
-
-        String[] vety = text.trim().isEmpty()
-                ? new String[0]
-                : text.split("[.!?]+");
-
-        if(vety.length == 0){
+        if(text.isEmpty()){
             JOptionPane.showMessageDialog(
                     rootPanel,
                     "Žádné věty v textu."
@@ -234,17 +219,26 @@ public class EditorWindow {
             return;
         }
 
-        String nejdelsi = vety[0].trim();
-        String nejkratsi = vety[0].trim();
+        String[] vety = text.split("[.!?]+");
+
+        int pocetVet = 0;
+
+        String nejdelsi = "";
+        String nejkratsi = "";
 
         for(String veta : vety){
             veta = veta.trim();
 
-            if(veta.length() > nejdelsi.length()){
-                nejdelsi = veta;
+            if(veta.isEmpty()){
+                continue;
             }
 
-            if(veta.length() < nejkratsi.length()){
+            pocetVet++;
+
+            if(nejdelsi.isEmpty() || veta.length() > nejdelsi.length()){
+                nejdelsi = veta;
+            }
+            if(nejkratsi.isEmpty() || veta.length() < nejkratsi.length()){
                 nejkratsi = veta;
             }
         }
