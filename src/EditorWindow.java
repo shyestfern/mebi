@@ -12,13 +12,56 @@ public class EditorWindow {
     private JTextArea textArea;
     private JPanel editorPanel;
     private JLabel statusBar;
+    private JPanel toolbarPanel;
+    private JLabel fontLabel;
+    private JComboBox fontBox;
+    private JLabel velikostLabel;
+    private JComboBox velikostBox;
+    private JCheckBox zalomitBox;
     private JMenuBar menuBar;
 
     private static final String FILE_NAME = "dokument.txt";
     private String soucasnySoubor = null;
 
+    private String vybranyFont = "Arial";
+    private int vybranaVelikost = 12;
+
+
     public JPanel getRootPanel(){
         return rootPanel;
+    }
+
+    private void updateFont(){
+        textArea.setFont(new Font(vybranyFont, Font.PLAIN, vybranaVelikost));
+    }
+
+    private void vytvorToolbar(){
+        fontBox.addActionListener(e -> {
+            vybranyFont = (String) fontBox.getSelectedItem();
+            updateFont();
+        });
+
+        velikostBox.addActionListener(e -> {
+            vybranaVelikost = Integer.parseInt(velikostBox.getSelectedItem().toString());
+            updateFont();
+        });
+
+        zalomitBox.setSelected(true);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+
+        zalomitBox.addActionListener(e -> {
+            boolean wrap = zalomitBox.isSelected();
+            textArea.setLineWrap(wrap);
+            textArea.setWrapStyleWord(wrap);
+            nastavStatus("Zalomování řádků " + (wrap ? "zapnuto" : "vypnuto"));
+        });
+
+        updateFont();
+    }
+
+    public EditorWindow(){
+        vytvorToolbar();
     }
 
     public JMenuBar vytvorMenuBar(){
@@ -36,9 +79,11 @@ public class EditorWindow {
         JMenuItem ulozitJakoItem = new JMenuItem("Uložit jako");
         JMenuItem ukoncitItem = new JMenuItem("Ukončit");
 
+        JMenuItem kopirovatItem = new JMenuItem("Kopírovat");
+        JMenuItem vlozitItem = new JMenuItem("Vložit");
+        JMenuItem vyjmoutItem = new JMenuItem("Vyjmout");
         JMenuItem najitItem = new JMenuItem("Najít");
-        JMenuItem velkaPismenaItem = new JMenuItem("Velká písmena");
-        JMenuItem malaPismenaItem = new JMenuItem("Malá písmena");
+        JMenuItem nahraditItem = new JMenuItem("Nahradit");
 
         JMenuItem analyzaTextuItem = new JMenuItem("Analýza textu");
         JMenuItem analyzaVetItem = new JMenuItem("Analýza vět");
@@ -63,9 +108,11 @@ public class EditorWindow {
         ulozitJakoItem.addActionListener(e -> ulozitJako());
         ukoncitItem.addActionListener(e -> ukoncit());
 
+        kopirovatItem.addActionListener(e -> kopirovat());
+        vlozitItem.addActionListener(e -> vlozit());
+        vyjmoutItem.addActionListener(e -> vyjmout());
         najitItem.addActionListener(e -> najit());
-        velkaPismenaItem.addActionListener(e -> velkaPismena());
-        malaPismenaItem.addActionListener(e -> malaPismena());
+        nahraditItem.addActionListener(e -> nahradit());
 
         analyzaTextuItem.addActionListener(e -> analyzaTextu());
         analyzaVetItem.addActionListener(e -> analyzaVet());
@@ -99,8 +146,20 @@ public class EditorWindow {
         ukoncitItem.setAccelerator(
                 KeyStroke.getKeyStroke("ctrl Q")
         );
+        kopirovatItem.setAccelerator(
+                KeyStroke.getKeyStroke("ctrl C")
+        );
+        vlozitItem.setAccelerator(
+                KeyStroke.getKeyStroke("ctrl V")
+        );
+        vyjmoutItem.setAccelerator(
+                KeyStroke.getKeyStroke("ctrl X")
+        );
         najitItem.setAccelerator(
                 KeyStroke.getKeyStroke("ctrl F")
+        );
+        nahraditItem.setAccelerator(
+                KeyStroke.getKeyStroke("ctrl R")
         );
 
         souborMenu.add(novyItem);
@@ -109,9 +168,11 @@ public class EditorWindow {
         souborMenu.add(ulozitJakoItem);
         souborMenu.add(ukoncitItem);
 
+        upravyMenu.add(kopirovatItem);
+        upravyMenu.add(vlozitItem);
+        upravyMenu.add(vyjmoutItem);
         upravyMenu.add(najitItem);
-        upravyMenu.add(velkaPismenaItem);
-        upravyMenu.add(malaPismenaItem);
+        upravyMenu.add(nahraditItem);
 
         analyzaMenu.add(analyzaTextuItem);
         analyzaMenu.add(analyzaVetItem);
@@ -251,6 +312,21 @@ public class EditorWindow {
         System.exit(0);
     }
 
+    private void kopirovat(){
+        textArea.copy();
+        nastavStatus("Text zkopírován do schránky");
+    }
+
+    private void vlozit(){
+        textArea.paste();
+        nastavStatus("Text vložen ze schránky");
+    }
+
+    private void vyjmout(){
+        textArea.cut();
+        nastavStatus("Text vyjmut do schránky");
+    }
+
     private void najit(){
         String hledanyText = JOptionPane.showInputDialog(
                 rootPanel,
@@ -261,10 +337,13 @@ public class EditorWindow {
             return;
         }
 
-        String text = textArea.getText().toLowerCase();
-        hledanyText = hledanyText.toLowerCase();
+        hledanyText = hledanyText.trim().toLowerCase();
 
-        int pocet = text.split(hledanyText).length - 1;
+        String text = textArea.getText().toLowerCase();
+
+        text = text.replace("\n", " ");
+
+        int pocet = text.split(hledanyText, -1).length - 1;
 
         JOptionPane.showMessageDialog(
                 rootPanel,
@@ -274,14 +353,37 @@ public class EditorWindow {
         );
     }
 
-    private void velkaPismena(){
-        String text = textArea.getText();
-        textArea.setText(text.toUpperCase());
-    }
+    private void nahradit(){
+        String hledanyText = JOptionPane.showInputDialog(
+                rootPanel,
+                "Zadejte text, který chcete nahradit:"
+        );
 
-    private void malaPismena(){
-        String text = textArea.getText();
-        textArea.setText(text.toLowerCase());
+        if(hledanyText == null || hledanyText.trim().isEmpty()){
+            return;
+        }
+
+        String novyText = JOptionPane.showInputDialog(
+                rootPanel,
+                "Zadejte nový text:"
+        );
+
+        if(novyText == null){
+            return;
+        }
+
+        String puvodniText = textArea.getText();
+
+        if(!puvodniText.contains(hledanyText)){
+            nastavStatus("Text \"" + hledanyText + "\" nebyl nalezen.");
+            return;
+        }
+
+        String novyObsah = puvodniText.replace(hledanyText, novyText);
+
+        textArea.setText(novyObsah);
+
+        nastavStatus("Všechny výskyty \"" + hledanyText + "\" byly nahrazeny \"" + novyText + "\".");
     }
 
     private void analyzaTextu(){
@@ -479,6 +581,9 @@ public class EditorWindow {
 
         if(color != null){
             rootPanel.setBackground(color);
+            toolbarPanel.setBackground(color);
+            zalomitBox.setBackground(color);
+            UIManager.put("OptionPane.background", color);
         }
     }
 
@@ -491,6 +596,9 @@ public class EditorWindow {
 
         if(color != null){
             textArea.setBackground(color);
+            fontBox.setBackground(color);
+            velikostBox.setBackground(color);
+            UIManager.put("Panel.background", color);
         }
     }
 
@@ -503,6 +611,14 @@ public class EditorWindow {
 
         if(color != null){
             textArea.setForeground(color);
+
+            statusBar.setForeground(color);
+            fontLabel.setForeground(color);
+            velikostLabel.setForeground(color);
+            fontBox.setForeground(color);
+            velikostBox.setForeground(color);
+
+            UIManager.put("OptionPane.messageForeground", color);
 
             menuBar.setForeground(color);
 
@@ -541,8 +657,12 @@ public class EditorWindow {
                     "Ctrl + O: Otevřít soubor\n" +
                     "Ctrl + S: Uložit práci\n" +
                     "Ctrl + Shift + S: Uložit jako...\n" +
-                    "Ctrl + Q: Ukončit program" + "\n" +
-                    "Ctrl + F: Najít text",
+                    "Ctrl + Q: Ukončit program\n" +
+                    "Ctrl + C: Kopírovat\n" +
+                    "Ctrl + V: Vložit\n" +
+                    "Ctrl + X: Vyjmout\n" +
+                    "Ctrl + F: Najít text\n" +
+                    "Ctrl + R: Nahradit text",
                     "Klávesové zkratky",
                         JOptionPane.INFORMATION_MESSAGE
         );
