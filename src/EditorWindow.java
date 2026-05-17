@@ -31,7 +31,10 @@ public class EditorWindow {
         JMenuItem ukoncitItem = new JMenuItem("Ukončit");
 
         JMenuItem analyzaTextuItem = new JMenuItem("Analýza textu");
+        JMenuItem analyzaVetItem = new JMenuItem("Analýza vět");
         JMenuItem analyzaSlovItem = new JMenuItem("Analýza slov");
+        JMenuItem analyzaZnakuItem = new JMenuItem("Analýza znaků");
+        JMenuItem casCteniItem = new JMenuItem("Čas čtení");
 
         JMenuItem navodItem = new JMenuItem("Návod");
         JMenuItem zkratkyItem = new JMenuItem("Klávesové zkratky");
@@ -46,7 +49,10 @@ public class EditorWindow {
         ukoncitItem.addActionListener(e -> ukoncit());
 
         analyzaTextuItem.addActionListener(e -> analyzaTextu());
+        analyzaVetItem.addActionListener(e -> analyzaVet());
         analyzaSlovItem.addActionListener(e -> analyzaSlov());
+        analyzaZnakuItem.addActionListener(e -> analyzaZnaku());
+        casCteniItem.addActionListener(e -> odhadCasuCteni());
 
         navodItem.addActionListener(e -> zobrazNavod());
         zkratkyItem.addActionListener(e -> zobrazZkratky());
@@ -77,7 +83,10 @@ public class EditorWindow {
         souborMenu.add(ukoncitItem);
 
         analyzaMenu.add(analyzaTextuItem);
+        analyzaMenu.add(analyzaVetItem);
         analyzaMenu.add(analyzaSlovItem);
+        analyzaMenu.add(analyzaZnakuItem);
+        analyzaMenu.add(casCteniItem);
 
         napovedaMenu.add(navodItem);
         napovedaMenu.add(zkratkyItem);
@@ -199,6 +208,57 @@ public class EditorWindow {
         );
     }
 
+    // OPRAV TUTO METODU - NEPOČÍTÁ SPRÁVNĚ VĚTY
+
+    private void analyzaVet(){
+        String text = textArea.getText();
+        int pocetVet = 0;
+
+        for(int i = 0; i < text.length(); i++){
+            char znak = text.charAt(i);
+
+            if(znak == '.' || znak == '!' || znak == '?'){
+                pocetVet++;
+            }
+        }
+
+        String[] vety = text.trim().isEmpty()
+                ? new String[0]
+                : text.split("[.!?]+");
+
+        if(vety.length == 0){
+            JOptionPane.showMessageDialog(
+                    rootPanel,
+                    "Žádné věty v textu."
+            );
+            return;
+        }
+
+        String nejdelsi = vety[0].trim();
+        String nejkratsi = vety[0].trim();
+
+        for(String veta : vety){
+            veta = veta.trim();
+
+            if(veta.length() > nejdelsi.length()){
+                nejdelsi = veta;
+            }
+
+            if(veta.length() < nejkratsi.length()){
+                nejkratsi = veta;
+            }
+        }
+
+        JOptionPane.showMessageDialog(
+                rootPanel,
+                "Počet vět: " + pocetVet + "\n" +
+                        "Nejdelší věta: " + nejdelsi + "\n" +
+                        "Nejkratší věta: " + nejkratsi + "\n",
+                "Analýza vět",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
     private void analyzaSlov(){
         String text = textArea.getText();
 
@@ -234,8 +294,59 @@ public class EditorWindow {
                 rootPanel,
                 "Nejdelší slovo: " + nejdelsi + "\n" +
                         "Nejkratší slovo: " + nejkratsi + "\n" +
-                        "Průměrná délka slova: " + String.format("%.2f", prumer),
+                        "Průměrná délka slova: " + String.format("%.2f", prumer) + "\n" +
+                        "Součet znaků ve slovech: " + celkemZnaku,
                 "Analýza slov",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
+    private void analyzaZnaku(){
+        String text = textArea.getText();
+
+        int velkaPismena = 0;
+        int malaPismena = 0;
+        int mezery = 0;
+
+        for(int i = 0; i < text.length(); i++){
+            char znak = text.charAt(i);
+
+            if(Character.isUpperCase(znak)){
+                velkaPismena++;
+            } else if (Character.isLowerCase(znak)){
+                malaPismena++;
+            } else if (Character.isWhitespace(znak)){
+                mezery++;
+            }
+        }
+
+        JOptionPane.showMessageDialog(
+                rootPanel,
+                "Velká písmena: " + velkaPismena + "\n" +
+                        "Malá písmena: " + malaPismena + "\n" +
+                        "Mezery: " + mezery,
+                "Analýza znaků",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
+    private void odhadCasuCteni(){
+        String text = textArea.getText();
+
+        int pocetSlov = text.trim().isEmpty()
+                ? 0
+                : text.trim().split("\\s+").length;
+
+        int celkemSekund = (int)((double) pocetSlov / 200 * 60);
+        int minuty = celkemSekund / 60;
+        int sekundy = celkemSekund % 60;
+
+        JOptionPane.showMessageDialog(
+                rootPanel,
+                "Odhadovaný čas čtení: " +
+                            minuty + " minut " +
+                            sekundy + " sekund",
+                "Čas čtení",
                 JOptionPane.INFORMATION_MESSAGE
         );
     }
