@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -10,6 +11,7 @@ public class EditorWindow {
     private JScrollPane scrollPane;
     private JTextArea textArea;
     private JPanel editorPanel;
+    private JMenuBar menuBar;
 
     private static final String FILE_NAME = "dokument.txt";
 
@@ -18,11 +20,12 @@ public class EditorWindow {
     }
 
     public JMenuBar vytvorMenuBar(){
-        JMenuBar menuBar = new JMenuBar();
+        menuBar = new JMenuBar();
 
         JMenu souborMenu = new JMenu("Soubor");
         JMenu upravyMenu = new JMenu("Úpravy");
         JMenu analyzaMenu = new JMenu("Analýza");
+        JMenu barvyMenu = new JMenu("Barvy");
         JMenu napovedaMenu = new JMenu("Nápověda");
 
         JMenuItem novyItem = new JMenuItem("Nový");
@@ -40,6 +43,11 @@ public class EditorWindow {
         JMenuItem analyzaSlovItem = new JMenuItem("Analýza slov");
         JMenuItem analyzaZnakuItem = new JMenuItem("Analýza znaků");
         JMenuItem casCteniItem = new JMenuItem("Čas čtení");
+
+        JMenuItem barvaMenuItem = new JMenuItem("Barva menu");
+        JMenuItem barvaPozadiItem = new JMenuItem("Barva pozadí");
+        JMenuItem barvaPoleItem = new JMenuItem("Barva pole");
+        JMenuItem barvaPismaItem = new JMenuItem("Barva písma");
 
         JMenuItem navodItem = new JMenuItem("Návod");
         JMenuItem zkratkyItem = new JMenuItem("Klávesové zkratky");
@@ -62,6 +70,11 @@ public class EditorWindow {
         analyzaSlovItem.addActionListener(e -> analyzaSlov());
         analyzaZnakuItem.addActionListener(e -> analyzaZnaku());
         casCteniItem.addActionListener(e -> odhadCasuCteni());
+
+        barvaMenuItem.addActionListener(e -> nastavBarvuMenu());
+        barvaPozadiItem.addActionListener(e -> nastavBarvuPozadi());
+        barvaPoleItem.addActionListener(e -> nastavBarvuPole());
+        barvaPismaItem.addActionListener(e -> nastavBarvuPisma());
 
         navodItem.addActionListener(e -> zobrazNavod());
         zkratkyItem.addActionListener(e -> zobrazZkratky());
@@ -104,6 +117,11 @@ public class EditorWindow {
         analyzaMenu.add(analyzaZnakuItem);
         analyzaMenu.add(casCteniItem);
 
+        barvyMenu.add(barvaMenuItem);
+        barvyMenu.add(barvaPozadiItem);
+        barvyMenu.add(barvaPoleItem);
+        barvyMenu.add(barvaPismaItem);
+
         napovedaMenu.add(navodItem);
         napovedaMenu.add(zkratkyItem);
         napovedaMenu.add(infoItem);
@@ -113,6 +131,7 @@ public class EditorWindow {
         menuBar.add(souborMenu);
         menuBar.add(upravyMenu);
         menuBar.add(analyzaMenu);
+        menuBar.add(barvyMenu);
         menuBar.add(napovedaMenu);
 
         return menuBar;
@@ -393,6 +412,84 @@ public class EditorWindow {
                 "Čas čtení",
                 JOptionPane.INFORMATION_MESSAGE
         );
+    }
+
+    private void nastavBarvuMenu(){
+        Color color = JColorChooser.showDialog(
+                rootPanel,
+                "Vyberte barvu menu",
+                menuBar.getBackground()
+        );
+
+        if(color != null){
+            menuBar.setBackground(color);
+
+            for(int i = 0; i < menuBar.getMenuCount(); i++){
+                JMenu menu = menuBar.getMenu(i);
+                if(menu != null){
+                    menu.setBackground(color);
+
+                    for(int j = 0; j < menu.getItemCount(); j++){
+                        JMenuItem item = menu.getItem(j);
+                        if(item != null){
+                            item.setBackground(color);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void nastavBarvuPozadi(){
+        Color color = JColorChooser.showDialog(
+                rootPanel,
+                "Vyberte barvu pozadí",
+                rootPanel.getBackground()
+        );
+
+        if(color != null){
+            rootPanel.setBackground(color);
+        }
+    }
+
+    private void nastavBarvuPole(){
+        Color color = JColorChooser.showDialog(
+                rootPanel,
+                "Vyberte barvu textového pole",
+                textArea.getBackground()
+        );
+
+        if(color != null){
+            textArea.setBackground(color);
+        }
+    }
+
+    private void nastavBarvuPisma(){
+        Color color = JColorChooser.showDialog(
+                rootPanel,
+                "Vyberte barvu písma",
+                textArea.getForeground()
+        );
+
+        if(color != null){
+            textArea.setForeground(color);
+
+            menuBar.setForeground(color);
+
+            for(int i = 0; i < menuBar.getMenuCount(); i++){
+                JMenu menu = menuBar.getMenu(i);
+                if(menu != null){
+                    menu.setForeground(color);
+
+                    for(int j = 0; j < menu.getItemCount(); j++){
+                        JMenuItem item = menu.getItem(j);
+                        if(item != null){
+                            item.setForeground(color);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private void zobrazNavod(){
