@@ -11,9 +11,11 @@ public class EditorWindow {
     private JScrollPane scrollPane;
     private JTextArea textArea;
     private JPanel editorPanel;
+    private JLabel statusBar;
     private JMenuBar menuBar;
 
     private static final String FILE_NAME = "dokument.txt";
+    private String soucasnySoubor = null;
 
     public JPanel getRootPanel(){
         return rootPanel;
@@ -137,6 +139,10 @@ public class EditorWindow {
         return menuBar;
     }
 
+    private void nastavStatus(String text){
+        statusBar.setText(text);
+    }
+
     private void novy(){
         if(!textArea.getText().isEmpty()){
             int zvolenaMoznost = JOptionPane.showConfirmDialog(
@@ -146,16 +152,22 @@ public class EditorWindow {
                     JOptionPane.YES_NO_CANCEL_OPTION
             );
 
+            if(zvolenaMoznost == JOptionPane.CANCEL_OPTION){
+                return;
+            }
+
             if(zvolenaMoznost == JOptionPane.YES_OPTION){
                 ulozit();
-                textArea.setText("");
             }
-            else if(zvolenaMoznost == JOptionPane.NO_OPTION){
-                textArea.setText("");
-            }
+
+            textArea.setText("");
+            soucasnySoubor = null;
+            nastavStatus("Vytvořen nový soubor");
         }
         else{
             textArea.setText("");
+            soucasnySoubor = null;
+            nastavStatus("Vytvořen nový soubor");
         }
     }
 
@@ -178,21 +190,28 @@ public class EditorWindow {
             while(scanner.hasNextLine()){
                 textArea.append(scanner.nextLine() + "\n");
             }
+
+            soucasnySoubor = nazevSouboru;
+
         } catch (FileNotFoundException e) {
             JOptionPane.showMessageDialog(
                         rootPanel,
                 "Soubor neexistuje!"
             );
         }
+
+        nastavStatus("Načten soubor: " + nazevSouboru);
     }
 
     private void ulozit(){
-        try(FileWriter fw = new FileWriter(FILE_NAME, false)){
+        if(soucasnySoubor == null){
+            soucasnySoubor = FILE_NAME;
+        }
+
+        try(FileWriter fw = new FileWriter(soucasnySoubor, false)){
             fw.write(textArea.getText());
-            JOptionPane.showMessageDialog(
-                        rootPanel,
-                "Uloženo do " + FILE_NAME
-            );
+            nastavStatus("Uloženo do " + soucasnySoubor);
+
         } catch (IOException e) {
             JOptionPane.showMessageDialog(
                         rootPanel,
@@ -217,11 +236,9 @@ public class EditorWindow {
 
         try(FileWriter fw = new FileWriter(nazevSouboru, false)){
             fw.write(textArea.getText());
+            soucasnySoubor = nazevSouboru;
+            nastavStatus("Uloženo do " + nazevSouboru);
 
-            JOptionPane.showMessageDialog(
-                    rootPanel,
-                    "Uloženo do " + nazevSouboru
-            );
         } catch (IOException e) {
             JOptionPane.showMessageDialog(
                     rootPanel,
