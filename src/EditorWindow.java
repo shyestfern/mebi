@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class EditorWindow {
-    private JPanel rootPanel;
+    private JPanel rootPanel; // hlavní panel editoru
     private JScrollPane scrollPane;
     private JTextArea textArea;
     private JPanel editorPanel;
@@ -27,15 +27,15 @@ public class EditorWindow {
     private int vybranaVelikost = 12;
 
 
-    public JPanel getRootPanel(){
+    public JPanel getRootPanel(){ // vrátí hlavní panel pro JFrame
         return rootPanel;
     }
 
-    private void updateFont(){
+    private void updateFont(){ // aktualizace fontu a velikosti textu
         textArea.setFont(new Font(vybranyFont, Font.PLAIN, vybranaVelikost));
     }
 
-    private void vytvorToolbar(){
+    private void vytvorToolbar(){ // vytvoření toolbaru s výběrem fontu, velikosti a zalamováním řádků
         fontBox.addActionListener(e -> {
             vybranyFont = (String) fontBox.getSelectedItem();
             updateFont();
@@ -60,12 +60,14 @@ public class EditorWindow {
         updateFont();
     }
 
-    public EditorWindow(){
+    public EditorWindow(){ // konstruktor, který inicializuje toolbar
         vytvorToolbar();
     }
 
-    public JMenuBar vytvorMenuBar(){
+    public JMenuBar vytvorMenuBar(){ // vytvoření hlavního menu editoru
         menuBar = new JMenuBar();
+
+        // definice hlavních položek menu
 
         JMenu souborMenu = new JMenu("Soubor");
         JMenu upravyMenu = new JMenu("Úpravy");
@@ -73,11 +75,17 @@ public class EditorWindow {
         JMenu barvyMenu = new JMenu("Barvy");
         JMenu napovedaMenu = new JMenu("Nápověda");
 
+        // definice položek pod jednotlivými menu
+
+        // položky pro Soubor
+
         JMenuItem novyItem = new JMenuItem("Nový");
         JMenuItem otevritItem = new JMenuItem("Otevřít");
         JMenuItem ulozitItem = new JMenuItem("Uložit");
         JMenuItem ulozitJakoItem = new JMenuItem("Uložit jako");
         JMenuItem ukoncitItem = new JMenuItem("Ukončit");
+
+        // položky pro Úpravy
 
         JMenuItem kopirovatItem = new JMenuItem("Kopírovat");
         JMenuItem vlozitItem = new JMenuItem("Vložit");
@@ -85,22 +93,30 @@ public class EditorWindow {
         JMenuItem najitItem = new JMenuItem("Najít");
         JMenuItem nahraditItem = new JMenuItem("Nahradit");
 
+        // položky pro Analýzu
+
         JMenuItem analyzaTextuItem = new JMenuItem("Analýza textu");
         JMenuItem analyzaVetItem = new JMenuItem("Analýza vět");
         JMenuItem analyzaSlovItem = new JMenuItem("Analýza slov");
         JMenuItem analyzaZnakuItem = new JMenuItem("Analýza znaků");
         JMenuItem casCteniItem = new JMenuItem("Čas čtení");
 
+        // položky pro Barvy
+
         JMenuItem barvaMenuItem = new JMenuItem("Barva menu");
         JMenuItem barvaPozadiItem = new JMenuItem("Barva pozadí");
         JMenuItem barvaPoleItem = new JMenuItem("Barva pole");
         JMenuItem barvaPismaItem = new JMenuItem("Barva písma");
+
+        // položky pro Nápovědu
 
         JMenuItem navodItem = new JMenuItem("Návod");
         JMenuItem zkratkyItem = new JMenuItem("Klávesové zkratky");
         JMenuItem infoItem = new JMenuItem("O programu");
         JMenuItem kontaktItem = new JMenuItem("Kontakt");
         JMenuItem licenceItem = new JMenuItem("Licence");
+
+        // přidání ActionListenerů pro jednotlivé položky menu
 
         novyItem.addActionListener(e -> novy());
         otevritItem.addActionListener(e -> otevrit());
@@ -130,6 +146,8 @@ public class EditorWindow {
         infoItem.addActionListener(e -> zobrazInfoOProgramu());
         kontaktItem.addActionListener(e -> zobrazKontakt());
         licenceItem.addActionListener(e -> zobrazLicenci());
+
+        // nastavení klávesových zkratek pro položky menu
 
         novyItem.setAccelerator(
                 KeyStroke.getKeyStroke("ctrl N")
@@ -162,6 +180,8 @@ public class EditorWindow {
                 KeyStroke.getKeyStroke("ctrl R")
         );
 
+        // přidání položek do jednotlivých menu
+
         souborMenu.add(novyItem);
         souborMenu.add(otevritItem);
         souborMenu.add(ulozitItem);
@@ -191,6 +211,8 @@ public class EditorWindow {
         napovedaMenu.add(kontaktItem);
         napovedaMenu.add(licenceItem);
 
+        // přidání hlavních menu do menu baru
+
         menuBar.add(souborMenu);
         menuBar.add(upravyMenu);
         menuBar.add(analyzaMenu);
@@ -200,11 +222,11 @@ public class EditorWindow {
         return menuBar;
     }
 
-    private void nastavStatus(String text){
+    private void nastavStatus(String text){ // aktualizace textu ve stavovém řádku
         statusBar.setText(text);
     }
 
-    private void novy(){
+    private void novy(){ // vytvoření nového souboru - zeptá se na uložení změn
         if(!textArea.getText().isEmpty()){
             int zvolenaMoznost = JOptionPane.showConfirmDialog(
                     rootPanel,
@@ -232,7 +254,7 @@ public class EditorWindow {
         }
     }
 
-    private void otevrit(){
+    private void otevrit(){ // otevření souboru - zeptá se na název souboru
         String nazevSouboru = JOptionPane.showInputDialog(
                 rootPanel,
                 "Zadejte název souboru k otevření:"
@@ -247,12 +269,12 @@ public class EditorWindow {
         }
 
         try(Scanner scanner = new Scanner(new File(nazevSouboru))){
-            textArea.setText("");
+            textArea.setText(""); // vyčistíme textové pole před načtením souboru
             while(scanner.hasNextLine()){
-                textArea.append(scanner.nextLine() + "\n");
+                textArea.append(scanner.nextLine() + "\n"); // postupně přidáváme každou řádku ze souboru
             }
 
-            soucasnySoubor = nazevSouboru;
+            soucasnySoubor = nazevSouboru; // uložíme aktuální soubor
 
         } catch (FileNotFoundException e) {
             JOptionPane.showMessageDialog(
@@ -264,13 +286,13 @@ public class EditorWindow {
         nastavStatus("Načten soubor: " + nazevSouboru);
     }
 
-    private void ulozit(){
+    private void ulozit(){ // uložení souboru - nezadává se název
         if(soucasnySoubor == null){
             soucasnySoubor = FILE_NAME;
         }
 
         try(FileWriter fw = new FileWriter(soucasnySoubor, false)){
-            fw.write(textArea.getText());
+            fw.write(textArea.getText()); // zapíšeme celý obsah textového pole do souboru
             nastavStatus("Uloženo do " + soucasnySoubor);
 
         } catch (IOException e) {
@@ -281,7 +303,7 @@ public class EditorWindow {
         }
     }
 
-    private void ulozitJako(){
+    private void ulozitJako(){ // uložení souboru - zeptá se na název souboru
         String nazevSouboru = JOptionPane.showInputDialog(
                     rootPanel,
           "Zadejte název souboru:"
@@ -308,26 +330,26 @@ public class EditorWindow {
         }
     }
 
-    private void ukoncit(){
+    private void ukoncit(){ // ukončení programu
         System.exit(0);
     }
 
-    private void kopirovat(){
+    private void kopirovat(){ // kopírování textu do schránky
         textArea.copy();
         nastavStatus("Text zkopírován do schránky");
     }
 
-    private void vlozit(){
+    private void vlozit(){ // vložení textu ze schránky
         textArea.paste();
         nastavStatus("Text vložen ze schránky");
     }
 
-    private void vyjmout(){
+    private void vyjmout(){ // vyjmutí textu do schránky
         textArea.cut();
         nastavStatus("Text vyjmut do schránky");
     }
 
-    private void najit(){
+    private void najit(){ // nalezení počtu výskytů zadaného textu
         String hledanyText = JOptionPane.showInputDialog(
                 rootPanel,
                 "Zadejte hledaný text:"
@@ -341,9 +363,9 @@ public class EditorWindow {
 
         String text = textArea.getText().toLowerCase();
 
-        text = text.replace("\n", " ");
+        text = text.replace("\n", " "); // všechny nové řádky nahradíme mezerami pro správné počítání
 
-        int pocet = text.split(hledanyText, -1).length - 1;
+        int pocet = text.split(hledanyText, -1).length - 1; // spočítáme počet výskytů hledaného textu
 
         JOptionPane.showMessageDialog(
                 rootPanel,
@@ -353,7 +375,7 @@ public class EditorWindow {
         );
     }
 
-    private void nahradit(){
+    private void nahradit(){ // nahrazení zadaného textu jiným textem
         String hledanyText = JOptionPane.showInputDialog(
                 rootPanel,
                 "Zadejte text, který chcete nahradit:"
@@ -379,14 +401,14 @@ public class EditorWindow {
             return;
         }
 
-        String novyObsah = puvodniText.replace(hledanyText, novyText);
+        String novyObsah = puvodniText.replace(hledanyText, novyText); // nahrazení všech výskytů hledaného textu novým
 
         textArea.setText(novyObsah);
 
         nastavStatus("Všechny výskyty \"" + hledanyText + "\" byly nahrazeny \"" + novyText + "\".");
     }
 
-    private void analyzaTextu(){
+    private void analyzaTextu(){ // počet znaků, řádků a slov
         String text = textArea.getText();
 
         int pocetZnaku = text.length();
@@ -409,7 +431,7 @@ public class EditorWindow {
         );
     }
 
-    private void analyzaVet(){
+    private void analyzaVet(){ // počet vět, nejdelší a nejkratší věta
         String text = textArea.getText().trim();
 
         if(text.isEmpty()){
@@ -420,7 +442,7 @@ public class EditorWindow {
             return;
         }
 
-        String[] vety = text.split("[.!?]+");
+        String[] vety = text.split("[.!?]+"); // rozdělíme text podle koncových interpunkcí
 
         int pocetVet = 0;
 
@@ -428,7 +450,7 @@ public class EditorWindow {
         String nejkratsi = "";
 
         for(String veta : vety){
-            veta = veta.trim();
+            veta = veta.trim(); // odstraníme přebytečné mezery kolem věty
 
             if(veta.isEmpty()){
                 continue;
@@ -454,12 +476,12 @@ public class EditorWindow {
         );
     }
 
-    private void analyzaSlov(){
+    private void analyzaSlov(){ // počet slov, nejdelší a nejkratší slovo, průměrná délka slova, součet znaků ve slovech
         String text = textArea.getText();
 
         String[] slova = text.trim().isEmpty()
                 ? new String[0]
-                : text.trim().split("\\s+");
+                : text.trim().split("\\s+"); // rozdělíme text na slova podle mezer
 
         if(slova.length == 0){
             JOptionPane.showMessageDialog(
@@ -496,7 +518,7 @@ public class EditorWindow {
         );
     }
 
-    private void analyzaZnaku(){
+    private void analyzaZnaku(){ // počet velkých písmen, malých písmen a mezer
         String text = textArea.getText();
 
         int velkaPismena = 0;
@@ -525,14 +547,14 @@ public class EditorWindow {
         );
     }
 
-    private void odhadCasuCteni(){
+    private void odhadCasuCteni(){ // na základě počtu slov - pruměrná rychlost 200 slov za minutu
         String text = textArea.getText();
 
         int pocetSlov = text.trim().isEmpty()
                 ? 0
                 : text.trim().split("\\s+").length;
 
-        int celkemSekund = (int)((double) pocetSlov / 200 * 60);
+        int celkemSekund = (int)((double) pocetSlov / 200 * 60); // přepočítáme počet slov na sekundy (200 slov/min)
         int minuty = celkemSekund / 60;
         int sekundy = celkemSekund % 60;
 
@@ -546,7 +568,7 @@ public class EditorWindow {
         );
     }
 
-    private void nastavBarvuMenu(){
+    private void nastavBarvuMenu(){ // nastavení barvy menu
         Color color = JColorChooser.showDialog(
                 rootPanel,
                 "Vyberte barvu menu",
@@ -559,12 +581,12 @@ public class EditorWindow {
             for(int i = 0; i < menuBar.getMenuCount(); i++){
                 JMenu menu = menuBar.getMenu(i);
                 if(menu != null){
-                    menu.setBackground(color);
+                    menu.setBackground(color); // změníme barvu jednotlivých položek menu
 
                     for(int j = 0; j < menu.getItemCount(); j++){
                         JMenuItem item = menu.getItem(j);
                         if(item != null){
-                            item.setBackground(color);
+                            item.setBackground(color); // změníme barvu podmenu položek
                         }
                     }
                 }
@@ -572,7 +594,7 @@ public class EditorWindow {
         }
     }
 
-    private void nastavBarvuPozadi(){
+    private void nastavBarvuPozadi(){ // nastavení barvy pozadí
         Color color = JColorChooser.showDialog(
                 rootPanel,
                 "Vyberte barvu pozadí",
@@ -583,11 +605,11 @@ public class EditorWindow {
             rootPanel.setBackground(color);
             toolbarPanel.setBackground(color);
             zalomitBox.setBackground(color);
-            UIManager.put("OptionPane.background", color);
+            UIManager.put("OptionPane.background", color); // změníme barvu pozadí pro dialogová okna
         }
     }
 
-    private void nastavBarvuPole(){
+    private void nastavBarvuPole(){ // nastavení barvy textového pole
         Color color = JColorChooser.showDialog(
                 rootPanel,
                 "Vyberte barvu textového pole",
@@ -598,11 +620,11 @@ public class EditorWindow {
             textArea.setBackground(color);
             fontBox.setBackground(color);
             velikostBox.setBackground(color);
-            UIManager.put("Panel.background", color);
+            UIManager.put("Panel.background", color); // pozadí pro ostatní panely
         }
     }
 
-    private void nastavBarvuPisma(){
+    private void nastavBarvuPisma(){ // nastavení barvy písma
         Color color = JColorChooser.showDialog(
                 rootPanel,
                 "Vyberte barvu písma",
@@ -625,12 +647,12 @@ public class EditorWindow {
             for(int i = 0; i < menuBar.getMenuCount(); i++){
                 JMenu menu = menuBar.getMenu(i);
                 if(menu != null){
-                    menu.setForeground(color);
+                    menu.setForeground(color); // barva textu jednotlivých menu
 
                     for(int j = 0; j < menu.getItemCount(); j++){
                         JMenuItem item = menu.getItem(j);
                         if(item != null){
-                            item.setForeground(color);
+                            item.setForeground(color); // barva textu jednotlivých podmenu položek
                         }
                     }
                 }
@@ -638,7 +660,7 @@ public class EditorWindow {
         }
     }
 
-    private void zobrazNavod(){
+    private void zobrazNavod(){ // zobrazení návodu k použití programu
         JOptionPane.showMessageDialog(
                 rootPanel,
                 "1. Pište svůj text do hlavního pole.\n" +
@@ -650,7 +672,7 @@ public class EditorWindow {
         );
     }
 
-    private void zobrazZkratky(){
+    private void zobrazZkratky(){ // zobrazení seznamu klávesových zkratek
         JOptionPane.showMessageDialog(
                     rootPanel,
                 "Ctrl + N: Nový soubor\n" +
@@ -668,7 +690,7 @@ public class EditorWindow {
         );
     }
 
-    private void zobrazInfoOProgramu(){
+    private void zobrazInfoOProgramu(){ // zobrazení informací o programu
         JOptionPane.showMessageDialog(
                         rootPanel,
                 "mebi\n" +
@@ -680,7 +702,7 @@ public class EditorWindow {
         );
     }
 
-    private void zobrazKontakt(){
+    private void zobrazKontakt(){ // zobrazení kontaktních informací autora programu
         JOptionPane.showMessageDialog(
                 rootPanel,
                 "Autor: shyestfern\n" +
@@ -690,7 +712,7 @@ public class EditorWindow {
         );
     }
 
-    private void zobrazLicenci(){
+    private void zobrazLicenci(){ // zobrazení informace o licenci programu
         JOptionPane.showMessageDialog(
                 rootPanel,
                 "Tento program byl vytvořen jako školní projekt.\n" +
