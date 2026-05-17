@@ -160,7 +160,20 @@ public class EditorWindow {
     }
 
     private void otevrit(){
-        try(Scanner scanner = new Scanner(new File(FILE_NAME))){
+        String nazevSouboru = JOptionPane.showInputDialog(
+                rootPanel,
+                "Zadejte název souboru k otevření:"
+        );
+
+        if(nazevSouboru == null || nazevSouboru.trim().isEmpty()){
+            return;
+        }
+
+        if(!nazevSouboru.endsWith(".txt")){
+            nazevSouboru += ".txt";
+        }
+
+        try(Scanner scanner = new Scanner(new File(nazevSouboru))){
             textArea.setText("");
             while(scanner.hasNextLine()){
                 textArea.append(scanner.nextLine() + "\n");
@@ -168,7 +181,7 @@ public class EditorWindow {
         } catch (FileNotFoundException e) {
             JOptionPane.showMessageDialog(
                         rootPanel,
-                "Chyba při načítání souboru!"
+                "Soubor neexistuje!"
             );
         }
     }
