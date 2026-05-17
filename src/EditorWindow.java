@@ -21,6 +21,7 @@ public class EditorWindow {
         JMenuBar menuBar = new JMenuBar();
 
         JMenu souborMenu = new JMenu("Soubor");
+        JMenu upravyMenu = new JMenu("Úpravy");
         JMenu analyzaMenu = new JMenu("Analýza");
         JMenu napovedaMenu = new JMenu("Nápověda");
 
@@ -29,6 +30,10 @@ public class EditorWindow {
         JMenuItem ulozitItem = new JMenuItem("Uložit");
         JMenuItem ulozitJakoItem = new JMenuItem("Uložit jako");
         JMenuItem ukoncitItem = new JMenuItem("Ukončit");
+
+        JMenuItem najitItem = new JMenuItem("Najít");
+        JMenuItem velkaPismenaItem = new JMenuItem("Velká písmena");
+        JMenuItem malaPismenaItem = new JMenuItem("Malá písmena");
 
         JMenuItem analyzaTextuItem = new JMenuItem("Analýza textu");
         JMenuItem analyzaVetItem = new JMenuItem("Analýza vět");
@@ -47,6 +52,10 @@ public class EditorWindow {
         ulozitItem.addActionListener(e -> ulozit());
         ulozitJakoItem.addActionListener(e -> ulozitJako());
         ukoncitItem.addActionListener(e -> ukoncit());
+
+        najitItem.addActionListener(e -> najit());
+        velkaPismenaItem.addActionListener(e -> velkaPismena());
+        malaPismenaItem.addActionListener(e -> malaPismena());
 
         analyzaTextuItem.addActionListener(e -> analyzaTextu());
         analyzaVetItem.addActionListener(e -> analyzaVet());
@@ -75,12 +84,19 @@ public class EditorWindow {
         ukoncitItem.setAccelerator(
                 KeyStroke.getKeyStroke("ctrl Q")
         );
+        najitItem.setAccelerator(
+                KeyStroke.getKeyStroke("ctrl F")
+        );
 
         souborMenu.add(novyItem);
         souborMenu.add(otevritItem);
         souborMenu.add(ulozitItem);
         souborMenu.add(ulozitJakoItem);
         souborMenu.add(ukoncitItem);
+
+        upravyMenu.add(najitItem);
+        upravyMenu.add(velkaPismenaItem);
+        upravyMenu.add(malaPismenaItem);
 
         analyzaMenu.add(analyzaTextuItem);
         analyzaMenu.add(analyzaVetItem);
@@ -95,6 +111,7 @@ public class EditorWindow {
         napovedaMenu.add(licenceItem);
 
         menuBar.add(souborMenu);
+        menuBar.add(upravyMenu);
         menuBar.add(analyzaMenu);
         menuBar.add(napovedaMenu);
 
@@ -183,6 +200,39 @@ public class EditorWindow {
 
     private void ukoncit(){
         System.exit(0);
+    }
+
+    private void najit(){
+        String hledanyText = JOptionPane.showInputDialog(
+                rootPanel,
+                "Zadejte hledaný text:"
+        );
+
+        if(hledanyText == null || hledanyText.trim().isEmpty()){
+            return;
+        }
+
+        String text = textArea.getText().toLowerCase();
+        hledanyText = hledanyText.toLowerCase();
+
+        int pocet = text.split(hledanyText).length - 1;
+
+        JOptionPane.showMessageDialog(
+                rootPanel,
+                "Počet nalezení: " + pocet,
+                "Najít",
+                JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
+    private void velkaPismena(){
+        String text = textArea.getText();
+        textArea.setText(text.toUpperCase());
+    }
+
+    private void malaPismena(){
+        String text = textArea.getText();
+        textArea.setText(text.toLowerCase());
     }
 
     private void analyzaTextu(){
@@ -364,7 +414,8 @@ public class EditorWindow {
                     "Ctrl + O: Otevřít soubor\n" +
                     "Ctrl + S: Uložit práci\n" +
                     "Ctrl + Shift + S: Uložit jako...\n" +
-                    "Ctrl + Q: Ukončit program",
+                    "Ctrl + Q: Ukončit program" + "\n" +
+                    "Ctrl + F: Najít text",
                     "Klávesové zkratky",
                         JOptionPane.INFORMATION_MESSAGE
         );
